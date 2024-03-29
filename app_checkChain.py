@@ -5,7 +5,7 @@ from app_transaction import transaction
 
 volume_locate = "/dbdata/" # 區塊鏈儲存點
 
-def app_checkChain():
+def app_checkChain(user):
     #setting
     file = "0.txt"
     check = 1
@@ -51,11 +51,12 @@ def app_checkChain():
         print("OK")
 
         sender = "angel"
-        reciver = sys.argv[1]
+        reciver = user
         money = "10"
         transaction(f"{sender},{reciver},{money}\n")
     
     
-    
-    
+if __name__ == "__main__":
+    user = sys.argv[1]
+    app_checkChain(user)
     
