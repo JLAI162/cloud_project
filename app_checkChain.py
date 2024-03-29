@@ -11,7 +11,7 @@ def app_checkChain(user):
     check = 1
 
     # read super block
-    with open(file) as f:
+    with open(volume_locate + file) as f:
         for line in f.readlines():
             lin = line.split(':')
             s = lin[1]
