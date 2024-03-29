@@ -54,6 +54,8 @@ def app_checkChain():
         transaction(f"{sender},{reciver},{money}\n")
     
     
-    
+if __name__ == "__main__":
+    user = sys.argv[1]
+    app_checkChain(user)   
     
     
