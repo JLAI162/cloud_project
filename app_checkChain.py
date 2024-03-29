@@ -49,7 +49,7 @@ def app_checkChain():
         print("OK")
 
         sender = "angel"
-        reciver = sys.argv[1]
+        reciver = user
         money = "10"
         transaction(f"{sender},{reciver},{money}\n")
     
