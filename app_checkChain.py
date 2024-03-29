@@ -5,17 +5,15 @@ from app_transaction import transaction
 
 volume_locate = "/dbdata/" # 區塊鏈儲存點
 
-def app_checkChain(user):
+def app_checkChain():
     #setting
     file = "0.txt"
     check = 1
 
-    # read super block
-    with open(volume_locate + file) as f:
-        for line in f.readlines():
-            lin = line.split(':')
-            s = lin[1]
-    block_number = int(s.split('.')[0])
+    # read super block for finding last block
+
+    last_block = open(volume_locate + file, mode='r').readline().split(':')[1].strip()
+    block_number = int(last_block.split('.')[0])
 
     #checkChain
     while block_number != 1:
@@ -51,12 +49,11 @@ def app_checkChain(user):
         print("OK")
 
         sender = "angel"
-        reciver = user
+        reciver = sys.argv[1]
         money = "10"
         transaction(f"{sender},{reciver},{money}\n")
     
     
-if __name__ == "__main__":
-    user = sys.argv[1]
-    app_checkChain(user)
+    
+    
     
