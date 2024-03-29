@@ -5,7 +5,7 @@ from app_transaction import transaction
 
 volume_locate = "/dbdata/" # 區塊鏈儲存點
 
-def app_checkChain():
+def app_checkChain(user):
     #setting
     file = "0.txt"
     check = 1
