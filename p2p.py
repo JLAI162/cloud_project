@@ -3,7 +3,7 @@ import hashlib
 import socket
 import threading
 
-volume_locate = "/dbdata/" # 區塊鏈儲存點
+volume_locate = "./BChain/" # 區塊鏈儲存點
 
 port = 8001 #本節點的port 
 peers = [('172.17.0.2', 8001), ('172.17.0.3', 8001)]  #跟另外二個IP:8001 節點通信
@@ -21,7 +21,9 @@ class P2PNode:
     def _listen(self):
         while True:
             data, addr = self.sock.recvfrom(1024)
-            print(f"Received {data.decode('utf-8')} from {addr}")
+            transaction_info = data.decode('utf-8')
+            local_transaction(transaction_info)
+            print(f"Received {transaction_info=} from {addr}")
 
     def send_messages(self, transaction_info):
             message = transaction_info
@@ -29,7 +31,7 @@ class P2PNode:
                 self.sock.sendto(message.encode('utf-8'), peer)
 
 def transaction(communicator, new_information):
-    print(new_information)
+    local_transaction(new_information)
     communicator.send_messages(new_information)
 
 
