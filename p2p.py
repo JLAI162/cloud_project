@@ -22,8 +22,8 @@ class P2PNode:
         while True:
             data, addr = self.sock.recvfrom(1024)
             transaction_info = data.decode('utf-8')
-            print(f"Received {transaction_info=} from {addr}")
             print("===============")
+            print(f"Received {transaction_info=} from {addr}")
             local_transaction(transaction_info)
 
     def send_messages(self, transaction_info):
@@ -182,7 +182,7 @@ def checkChain(user):
         sender = "angel"
         reciver = user
         money = "10"
-        transaction(f"{sender},{reciver},{money}\n")
+        transaction(node,f"{sender},{reciver},{money}\n")
 
 def checkLog(user):
     current_dir= "1.txt" # 起始點
