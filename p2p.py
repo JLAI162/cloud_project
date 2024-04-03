@@ -25,6 +25,7 @@ class P2PNode:
             print("===============")
             print(f"Received {transaction_info=} from {addr}")
             local_transaction(transaction_info)
+            print("===============")
 
     def send_messages(self, transaction_info):
             message = transaction_info
