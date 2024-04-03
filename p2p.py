@@ -22,8 +22,9 @@ class P2PNode:
         while True:
             data, addr = self.sock.recvfrom(1024)
             transaction_info = data.decode('utf-8')
-            local_transaction(transaction_info)
             print(f"Received {transaction_info=} from {addr}")
+            print("===============")
+            local_transaction(transaction_info)
 
     def send_messages(self, transaction_info):
             message = transaction_info
