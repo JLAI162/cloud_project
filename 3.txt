@@ -1,0 +1,7 @@
+Shashlib256 of previous block: dec446985b7763417dffee2b0091d4c093e29dd6381c98126601167cac0ee301
+Next block: 4.txt
+angel,2,10
+angel,2,10
+angel,2,10
+angel,2,10
+angel,2,10

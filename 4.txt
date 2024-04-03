@@ -1,0 +1,4 @@
+Shashlib256 of previous block: 47b808dfd96a9c062ebb70308977c0ff2ff8d03bb09e9f600c9dcbbd75ac3f7a
+Next block: x
+angel,2,10
+angel,2,10
