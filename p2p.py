@@ -5,6 +5,34 @@ import threading
 
 volume_locate = "/dbdata/" # 區塊鏈儲存點
 
+port = 8001 #本節點的port 
+peers = [('172.17.0.2', 8001), ('172.17.0.3', 8001)]  #跟另外二個IP:8001 節點通信
+
+class P2PNode:
+    def __init__(self, port, peers):
+        self.port = port
+        self.peers = peers
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind(('172.17.0.4', self.port)) #這是本節點的 IP
+
+    def start(self):
+        threading.Thread(target=self._listen).start()
+
+    def _listen(self):
+        while True:
+            data, addr = self.sock.recvfrom(1024)
+            print(f"Received {data.decode('utf-8')} from {addr}")
+
+    def send_messages(self, transaction_info):
+            message = transaction_info
+            for peer in self.peers:
+                self.sock.sendto(message.encode('utf-8'), peer)
+
+def transaction(communicator, new_information):
+    print(new_information)
+    communicator.send_messages(new_information)
+
+
 def create_block(new_information):
 
     file = '0.txt' # super block
@@ -37,7 +65,7 @@ def create_block(new_information):
         f.write(''.join(new_content[:]))
         f.write(new_information)
 
-def transaction(new_information):
+def local_transaction(new_information):
 
     file = '0.txt'
 
@@ -179,6 +207,10 @@ def checkLog(user):
 
 
 if __name__ == "__main__":
+    
+    node = P2PNode(port, peers)
+    node.start()
+
     while True:
         print("===============")
         command = input("Enter a command {transaction,  checkChain, checkLog, checkMoney, checkAllChains, exit} : \n")
@@ -187,7 +219,7 @@ if __name__ == "__main__":
         print("===============")
         if commands[0] == "transaction":
             new_information = f"{commands[1]},{commands[2]},{commands[3]}\n"
-            transaction(new_information)
+            transaction(node, new_information)
 
         elif commands[0] == "checkChain":
             checkChain(commands[1])
