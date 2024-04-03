@@ -13,7 +13,7 @@ def create_block(new_information):
         last_block = super_block.readline().split(':')[1].strip()
         # new block file
         new_block = str(int(last_block.split('.')[0]) + 1) + ".txt" 
-      
+    
     # update super block
     with open(volume_locate + file, mode='w') as super_block:
         super_block.write("block:" + new_block)

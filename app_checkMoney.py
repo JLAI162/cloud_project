@@ -33,9 +33,8 @@ def calculate_balance(user):
         i -= 1
         
     return balance     
-      
-        
-    
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
