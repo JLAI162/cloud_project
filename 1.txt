@@ -1,7 +1,0 @@
-Sha256 of previous block: x
-Next block: 2.txt
-root,angel,9999999
-2,3,4
-2,3,4
-2,3,4
-angel,2,10
