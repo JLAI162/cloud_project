@@ -132,7 +132,8 @@ class P2PNode:
 
         response_list.clear()
 
-        message = f"check_request,{local_addr},{"1.txt"},{user}"
+        first_block = "1.txt"
+        message = f"check_request,{local_addr},{first_block},{user}"
         send_messages_to_all(message)
 
     
