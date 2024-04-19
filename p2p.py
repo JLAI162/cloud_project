@@ -6,9 +6,9 @@ import time
 
 volume_locate = "./BChain/" # 區塊鏈儲存點
 
+port = 8001 # 節點的port 
 local_addr = '172.17.0.4'
-port = 8001 #本節點的port 
-peers = [('172.17.0.2', 8001), ('172.17.0.3', 8001)]  #跟另外二個IP:8001 節點通信
+peers = [('172.17.0.2', port), ('172.17.0.3', port)]  #跟另外二個IP:8001 節點通信
 
 class P2PNode:
     def __init__(self, port, peers):
@@ -17,6 +17,7 @@ class P2PNode:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((local_addr, self.port)) #這是本節點的 IP
         self.response_list = []
+        self.checked_node = []
 
     def start(self):
         threading.Thread(target=self._listen).start()
@@ -81,7 +82,7 @@ class P2PNode:
                 self.send_messages(request_node, message)
 
             elif tag == "check_response":
-                request_node = message_info.strip().split(',')[1]
+                response_node = message_info.strip().split(',')[1]
                 check_block = message_info.strip().split(',')[2]
                 check_hsh = message_info.strip().split(',')[3]
                 user = message_info.strip().split(',')[4]
@@ -92,9 +93,9 @@ class P2PNode:
                     hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
 
                 if hsh_code == check_hsh:
-                    print(f"{check_block}: {request_node} and {local_addr} -> Yes")
+                    print(f"{check_block}: {response_node} and {local_addr} -> Yes")
                 else:
-                    print(f"{check_block}: {request_node} and {local_addr} -> NO")
+                    print(f"{check_block}: {response_node} and {local_addr} -> NO")
 
                 with open(volume_locate + "0.txt", mode='r') as super_block:
                     # last block file
@@ -103,11 +104,15 @@ class P2PNode:
                 if check_block != last_block:
                     next_check = str(int(last_block.split('.')[0]) + 1) + ".txt"
                     message = f"check_request,{local_addr},{next_check},{user}"
-                    self.send_messages(request_node,message)
+                    self.send_messages(response_node,message)
                 else:
-                    print("checkAllChain Done")
-                    transaction_info = f"angel,{user},100\n"
-                    transaction(self,transaction_info)
+                    checked_node.append(response_node)
+
+                    if len(checked_node) == 2:
+                        print("checkAllChain Done")
+                        transaction_info = f"angel,{user},100\n"
+                        transaction(self,transaction_info)
+                        checked_node.clear()
 
             else:
                 print("===============")
@@ -119,7 +124,7 @@ class P2PNode:
                 self.sock.sendto(message.encode('utf-8'), peer)
     
     def send_messages(self, node, message):
-        self.sock.sendto(message.encode('utf-8'), (node, 8001))
+        self.sock.sendto(message.encode('utf-8'), (node, port))
 
 
     def checkAllChains(self, user):
@@ -129,13 +134,15 @@ class P2PNode:
         time.sleep(5)
 
         if len(self.response_list) < len(peers) :
+            first_block = "1.txt"
+            message = f"check_request,{local_addr},{first_block},{user}"
+            self.send_messages_to_all(message)
+        else:
             print("reponse node < 50%")
 
         self.response_list.clear()
 
-        first_block = "1.txt"
-        message = f"check_request,{local_addr},{first_block},{user}"
-        self.send_messages_to_all(message)
+        
 
     
 
@@ -318,8 +325,6 @@ def checkLog(user):
             break
 
 
-
-def checkAllChainsdd():
     # Create a dictionary to store the last block hash of each node
     last_block_hashes = {}
     
