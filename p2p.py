@@ -113,11 +113,11 @@ class P2PNode:
                 print("can't recognize message's tag")
                 print("===============")
 
-    def send_messages_to_all(message):
+    def send_messages_to_all(self, message):
             for peer in self.peers:
                 self.sock.sendto(message.encode('utf-8'), peer)
     
-    def send_messages(node, message):
+    def send_messages(self, node, message):
         self.sock.sendto(message.encode('utf-8'), node)
 
 
