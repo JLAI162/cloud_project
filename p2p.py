@@ -46,7 +46,7 @@ class P2PNode:
                     hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
                 
                 message = f"response_checkAllChains,{local_addr},{hsh_code}"
-                send_messages(request_node, message)
+                self.send_messages(request_node, message)
 
             elif tag == "response_checkAllChains":
                 response_node = message_info.strip().spilt(',')[1]
@@ -63,7 +63,7 @@ class P2PNode:
                 if hsh_code != check_hsh:
                     print(f"{response_node} and {local_addr} lask block error")
 
-                response_list.append(response_node)
+                self.response_list.append(response_node)
             
 
             elif tag == "check_request":
@@ -77,7 +77,7 @@ class P2PNode:
                     hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
 
                 message = f"check_response,{local_addr},{check_block},{hsh_code},{user}"
-                send_messages(request_node, message)
+                self.send_messages(request_node, message)
 
             elif tag == "check_response":
                 request_node = message_info.strip().spilt(',')[1]
@@ -102,7 +102,7 @@ class P2PNode:
                 if check_block != last_block:
                     next_check = str(int(last_block.split('.')[0]) + 1) + ".txt"
                     message = f"check_request,{local_addr},{next_check},{user}"
-                    send_messages(request_node,message)
+                    self.send_messages(request_node,message)
                 else:
                     print("checkAllChain Done")
                     transaction_info = f"angel,{user},100\n"
@@ -123,18 +123,18 @@ class P2PNode:
 
     def checkAllChains(self, user):
         message = f"request_checkAllChains,{local_addr}" 
-        send_messages_to_all(message)
+        self.send_messages_to_all(message)
 
         sleep(5)
 
         if len(response_list) < len(peers) + 1:
             print("reponse node < 50%")
 
-        response_list.clear()
+        self.response_list.clear()
 
         first_block = "1.txt"
         message = f"check_request,{local_addr},{first_block},{user}"
-        send_messages_to_all(message)
+        self.send_messages_to_all(message)
 
     
 
