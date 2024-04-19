@@ -5,6 +5,7 @@ import threading
 
 volume_locate = "./BChain/" # 區塊鏈儲存點
 
+local_addr = '172.17.0.4'
 port = 8001 #本節點的port 
 peers = [('172.17.0.2', 8001), ('172.17.0.3', 8001)]  #跟另外二個IP:8001 節點通信
 
@@ -13,7 +14,8 @@ class P2PNode:
         self.port = port
         self.peers = peers
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('172.17.0.4', self.port)) #這是本節點的 IP
+        self.sock.bind((local_addr, self.port)) #這是本節點的 IP
+        self.response_list = []
 
     def start(self):
         threading.Thread(target=self._listen).start()
@@ -21,21 +23,108 @@ class P2PNode:
     def _listen(self):
         while True:
             data, addr = self.sock.recvfrom(1024)
-            transaction_info = data.decode('utf-8')
-            print("===============")
-            print(f"Received {transaction_info=} from {addr}")
-            local_transaction(transaction_info)
-            print("===============")
+            message_info = data.decode('utf-8')
 
-    def send_messages(self, transaction_info):
-            message = transaction_info
+            tag = message_info.strip().split(',')[0]
+            
+            if tag == "transaction":
+                transaction_info = message_info.strip().spilt(',',1)[1]
+                print("===============")
+                print(f"Received {transaction_info=} from {addr}")
+                local_transaction(transaction_info)
+                print("===============")
+
+            elif tag == "request_checkAllChains":
+                request_node = message_info.strip().spilt(',',1)[1]
+
+                with open(volume_locate+'0.txt', mode = 'r') as super_block:
+                    last_block = super_block.readline().split(':')[1].strip()
+
+                with open(volume_locate+last_block,'r') as f:
+
+                    text = f.read()
+                    hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
+                
+                message = f"response_checkAllChains,{local_addr},{hsh_code}"
+                send_messages(request_node, message)
+
+            elif tag == "response_checkAllChains":
+                response_node = message_info.strip().spilt(',')[1]
+                response_list.append(response_node)
+            
+
+            elif tag == "check_request":
+                request_node = message_info.strip().spilt(',',1)[1]
+                check_block = message_info.strip().spilt(',')[2]
+
+                with open(volume_locate+check_block,'r') as f:
+
+                    text = f.read()
+                    hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
+
+                message = f"check_response,{local_addr},{check_block},{hsh_code}"
+                send_messages(request_node, message)
+
+            elif tag == "check_response":
+                request_node = message_info.strip().spilt(',',1)[1]
+                check_block = message_info.strip().spilt(',')[2]
+                check_hsh = message_info.strip().spilt(',')[2]
+
+                with open(volume_locate+check_block,'r') as f:
+
+                    text = f.read()
+                    hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
+
+                if hsh_code == check_hsh:
+                    print(f"{check_block}: {request_node} and {local_addr} -> Yes")
+                else:
+                    print(f"{check_block}: {request_node} and {local_addr} -> NO")
+
+                with open(volume_locate + file, mode='r') as super_block:
+                    # last block file
+                    last_block = super_block.readline().split(':')[1].strip()
+
+                if check_block != last_block:
+                    next_check = = str(int(last_block.split('.')[0]) + 1) + ".txt"
+                    message = f"check_request,{local_addr},{next_check}"
+                    send_messages(request_node,message)
+                else:
+                    print("checkAllChain Done")
+
+            else:
+                print("===============")
+                print("can't recognize message's tag")
+                print("===============")
+
+    def send_messages_to_all(message):
             for peer in self.peers:
                 self.sock.sendto(message.encode('utf-8'), peer)
+    
+    def send_messages(node, message):
+        self.sock.sendto(message.encode('utf-8'), node)
 
-def transaction(communicator, new_information):
-    local_transaction(new_information)
-    communicator.send_messages(new_information)
 
+    def checkAllChains(self):
+        message = f"request_checkAllChains,{local_addr}" 
+        send_messages_to_all(message)
+
+        sleep(5)
+
+        if len(response_list) < len(peers) + 1:
+            print("reponse node < 50%")
+
+        response_list.clear()
+
+        message = f"check_request,{local_addr},{"1.txt"}"
+        send_messages_to_all(message)
+
+    
+
+
+def transaction(communicator, transaction_info):
+    local_transaction(transaction_info)
+    transaction_info = "transaction," + transaction_info
+    communicator.send_messages_to_all(new_information)
 
 def create_block(new_information):
 
@@ -209,6 +298,40 @@ def checkLog(user):
         if(current_dir == "x"):
             break
 
+
+
+def checkAllChainsdd():
+    # Create a dictionary to store the last block hash of each node
+    last_block_hashes = {}
+    
+    # Send checkAllChains command to all peers and collect their responses
+    for peer in node.peers:
+        message = f"checkAllChains,{local_addr}"
+        node.sock.sendto("checkAllChains".encode('utf-8'), peer)
+        
+        # Receive the response from the peer
+        data, addr = node.sock.recvfrom(1024)
+        peer_last_block_hash = data.decode('utf-8')
+        
+        # Store the last block hash of the peer
+        last_block_hashes[addr] = peer_last_block_hash
+    
+    # Calculate the hash of the last block in the local chain
+    local_last_block_hash = calculate_last_block_hash()
+    
+    # Compare the last block hash from each peer with the local last block hash
+    all_hashes_equal = True
+    for peer, peer_last_block_hash in last_block_hashes.items():
+        if peer_last_block_hash != local_last_block_hash:
+            print(f"No - Last block hash does not match with peer {peer}")
+            all_hashes_equal = False
+        else:
+            print(f"Yes - Last block hash matches with peer {peer}")
+    
+    # If all hashes match, reward the user
+    if all_hashes_equal:
+        print("All hashes match. User receives 100 reward.")
+        reward_user()  # Implement this function to give reward to the user
 
 if __name__ == "__main__":
     
