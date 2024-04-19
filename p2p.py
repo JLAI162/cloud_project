@@ -35,7 +35,7 @@ class P2PNode:
                 print("===============")
 
             elif tag == "request_checkAllChains":
-                request_node = message_info.strip().spilt(',',1)[1]
+                request_node = message_info.strip().spilt(',')[1]
 
                 with open(volume_locate+'0.txt', mode = 'r') as super_block:
                     last_block = super_block.readline().split(':')[1].strip()
@@ -50,25 +50,40 @@ class P2PNode:
 
             elif tag == "response_checkAllChains":
                 response_node = message_info.strip().spilt(',')[1]
+                check_hsh = message_info.strip().spilt(',')[2]
+
+                with open(volume_locate+'0.txt', mode = 'r') as super_block:
+                    last_block = super_block.readline().split(':')[1].strip()
+
+                with open(volume_locate+last_block,'r') as f:
+
+                    text = f.read()
+                    hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
+
+                if hsh_code != check_hsh:
+                    print(f"{response_node} and {local_addr} lask block error")
+
                 response_list.append(response_node)
             
 
             elif tag == "check_request":
-                request_node = message_info.strip().spilt(',',1)[1]
+                request_node = message_info.strip().spilt(',')[1]
                 check_block = message_info.strip().spilt(',')[2]
+                user = message_info.strip().spilt(',')[3] 
 
                 with open(volume_locate+check_block,'r') as f:
 
                     text = f.read()
                     hsh_code = hashlib.sha3_256(text.encode()).hexdigest()
 
-                message = f"check_response,{local_addr},{check_block},{hsh_code}"
+                message = f"check_response,{local_addr},{check_block},{hsh_code},{user}"
                 send_messages(request_node, message)
 
             elif tag == "check_response":
-                request_node = message_info.strip().spilt(',',1)[1]
+                request_node = message_info.strip().spilt(',')[1]
                 check_block = message_info.strip().spilt(',')[2]
-                check_hsh = message_info.strip().spilt(',')[2]
+                check_hsh = message_info.strip().spilt(',')[3]
+                user = message_info.strip().spilt(',')[2]
 
                 with open(volume_locate+check_block,'r') as f:
 
@@ -86,10 +101,12 @@ class P2PNode:
 
                 if check_block != last_block:
                     next_check = = str(int(last_block.split('.')[0]) + 1) + ".txt"
-                    message = f"check_request,{local_addr},{next_check}"
+                    message = f"check_request,{local_addr},{next_check},{user}"
                     send_messages(request_node,message)
                 else:
                     print("checkAllChain Done")
+                    transaction_info = f"angel,{user},100\n"
+                    transaction(self,)
 
             else:
                 print("===============")
@@ -104,7 +121,7 @@ class P2PNode:
         self.sock.sendto(message.encode('utf-8'), node)
 
 
-    def checkAllChains(self):
+    def checkAllChains(self, user):
         message = f"request_checkAllChains,{local_addr}" 
         send_messages_to_all(message)
 
@@ -115,7 +132,7 @@ class P2PNode:
 
         response_list.clear()
 
-        message = f"check_request,{local_addr},{"1.txt"}"
+        message = f"check_request,{local_addr},{"1.txt"},{user}"
         send_messages_to_all(message)
 
     
