@@ -128,7 +128,7 @@ class P2PNode:
 
         time.sleep(5)
 
-        if len(self.response_list) < len(peers) + 1:
+        if len(self.response_list) < len(peers) :
             print("reponse node < 50%")
 
         self.response_list.clear()
