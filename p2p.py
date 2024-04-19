@@ -119,7 +119,7 @@ class P2PNode:
                 self.sock.sendto(message.encode('utf-8'), peer)
     
     def send_messages(self, node, message):
-        self.sock.sendto(message.encode('utf-8'), (node,))
+        self.sock.sendto(message.encode('utf-8'), (node, 8001))
 
 
     def checkAllChains(self, user):
