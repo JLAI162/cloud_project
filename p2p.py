@@ -29,14 +29,14 @@ class P2PNode:
             tag = message_info.strip().split(',')[0]
             
             if tag == "transaction":
-                transaction_info = message_info.strip().spilt(',',1)[1]
+                transaction_info = message_info.strip().split(',',1)[1]
                 print("===============")
                 print(f"Received {transaction_info=} from {addr}")
                 local_transaction(transaction_info)
                 print("===============")
 
             elif tag == "request_checkAllChains":
-                request_node = message_info.strip().spilt(',')[1]
+                request_node = message_info.strip().split(',')[1]
 
                 with open(volume_locate+'0.txt', mode = 'r') as super_block:
                     last_block = super_block.readline().split(':')[1].strip()
@@ -50,8 +50,8 @@ class P2PNode:
                 self.send_messages(request_node, message)
 
             elif tag == "response_checkAllChains":
-                response_node = message_info.strip().spilt(',')[1]
-                check_hsh = message_info.strip().spilt(',')[2]
+                response_node = message_info.strip().split(',')[1]
+                check_hsh = message_info.strip().split(',')[2]
 
                 with open(volume_locate+'0.txt', mode = 'r') as super_block:
                     last_block = super_block.readline().split(':')[1].strip()
@@ -68,9 +68,9 @@ class P2PNode:
             
 
             elif tag == "check_request":
-                request_node = message_info.strip().spilt(',')[1]
-                check_block = message_info.strip().spilt(',')[2]
-                user = message_info.strip().spilt(',')[3] 
+                request_node = message_info.strip().split(',')[1]
+                check_block = message_info.strip().split(',')[2]
+                user = message_info.strip().split(',')[3] 
 
                 with open(volume_locate+check_block,'r') as f:
 
@@ -81,10 +81,10 @@ class P2PNode:
                 self.send_messages(request_node, message)
 
             elif tag == "check_response":
-                request_node = message_info.strip().spilt(',')[1]
-                check_block = message_info.strip().spilt(',')[2]
-                check_hsh = message_info.strip().spilt(',')[3]
-                user = message_info.strip().spilt(',')[2]
+                request_node = message_info.strip().split(',')[1]
+                check_block = message_info.strip().split(',')[2]
+                check_hsh = message_info.strip().split(',')[3]
+                user = message_info.strip().split(',')[2]
 
                 with open(volume_locate+check_block,'r') as f:
 
