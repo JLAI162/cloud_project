@@ -100,7 +100,7 @@ class P2PNode:
                     last_block = super_block.readline().split(':')[1].strip()
 
                 if check_block != last_block:
-                    next_check = = str(int(last_block.split('.')[0]) + 1) + ".txt"
+                    next_check = str(int(last_block.split('.')[0]) + 1) + ".txt"
                     message = f"check_request,{local_addr},{next_check},{user}"
                     send_messages(request_node,message)
                 else:
