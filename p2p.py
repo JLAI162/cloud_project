@@ -107,7 +107,7 @@ class P2PNode:
                 else:
                     print("checkAllChain Done")
                     transaction_info = f"angel,{user},100\n"
-                    transaction(self,)
+                    transaction(self,transaction_info)
 
             else:
                 print("===============")
