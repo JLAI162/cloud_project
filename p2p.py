@@ -96,7 +96,7 @@ class P2PNode:
                 else:
                     print(f"{check_block}: {request_node} and {local_addr} -> NO")
 
-                with open(volume_locate + file, mode='r') as super_block:
+                with open(volume_locate + "0.txt", mode='r') as super_block:
                     # last block file
                     last_block = super_block.readline().split(':')[1].strip()
 
