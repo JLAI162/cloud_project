@@ -84,7 +84,7 @@ class P2PNode:
                 request_node = message_info.strip().split(',')[1]
                 check_block = message_info.strip().split(',')[2]
                 check_hsh = message_info.strip().split(',')[3]
-                user = message_info.strip().split(',')[2]
+                user = message_info.strip().split(',')[4]
 
                 with open(volume_locate+check_block,'r') as f:
 
@@ -143,7 +143,7 @@ class P2PNode:
 def transaction(communicator, transaction_info):
     local_transaction(transaction_info)
     transaction_info = "transaction," + transaction_info
-    communicator.send_messages_to_all(new_information)
+    communicator.send_messages_to_all(transaction_info)
 
 def create_block(new_information):
 
