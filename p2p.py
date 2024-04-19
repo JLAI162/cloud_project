@@ -1,8 +1,9 @@
 import os
+import time
 import hashlib 
 import socket
 import threading
-import time
+
 
 volume_locate = "./BChain/" # 區塊鏈儲存點
 
@@ -23,6 +24,13 @@ class P2PNode:
         threading.Thread(target=self._listen).start()
 
     def _listen(self):
+        ''' 
+        transaction
+        request_checkAllChains
+        response_checkAllChains
+        check_request
+        check_response
+        '''
         while True:
             data, addr = self.sock.recvfrom(1024)
             message_info = data.decode('utf-8')
@@ -35,6 +43,7 @@ class P2PNode:
                 print(f"Received {transaction_info=} from {addr}")
                 local_transaction(transaction_info)
                 print("===============")
+
 
             elif tag == "request_checkAllChains":
                 request_node = message_info.strip().split(',')[1]
@@ -49,6 +58,7 @@ class P2PNode:
                 
                 message = f"response_checkAllChains,{local_addr},{hsh_code}"
                 self.send_messages(request_node, message)
+
 
             elif tag == "response_checkAllChains":
                 response_node = message_info.strip().split(',')[1]
@@ -80,6 +90,7 @@ class P2PNode:
 
                 message = f"check_response,{local_addr},{check_block},{hsh_code},{user}"
                 self.send_messages(request_node, message)
+
 
             elif tag == "check_response":
                 response_node = message_info.strip().split(',')[1]
@@ -114,6 +125,7 @@ class P2PNode:
                         transaction(self,transaction_info)
                         checked_node.clear()
 
+
             else:
                 print("===============")
                 print("can't recognize message's tag")
@@ -142,15 +154,13 @@ class P2PNode:
 
         self.response_list.clear()
 
-        
 
-    
+    def transaction(self, transaction_info):
+        local_transaction(transaction_info)
+        transaction_info = "transaction," + transaction_info
+        self.send_messages_to_all(transaction_info)
 
 
-def transaction(communicator, transaction_info):
-    local_transaction(transaction_info)
-    transaction_info = "transaction," + transaction_info
-    communicator.send_messages_to_all(transaction_info)
 
 def create_block(new_information):
 
@@ -217,7 +227,7 @@ def local_transaction(new_information):
     except Exception as ex:
         print(ex)
 
-def calculate_balance(user):
+def checkMoney(user):
     balance = 0  # 初始化餘額 
 
     # 循環遍歷所有區塊
@@ -247,10 +257,7 @@ def calculate_balance(user):
         
         i -= 1
         
-    return balance    
-
-def checkMoney(user):
-    print(f"{user}的帳戶餘額是: ${calculate_balance(user)}")
+    print(f"{user}的帳戶餘額是: ${balance}")    
 
 def checkChain(user):
     #setting
@@ -370,7 +377,7 @@ if __name__ == "__main__":
         print("===============")
         if commands[0] == "transaction":
             new_information = f"{commands[1]},{commands[2]},{commands[3]}\n"
-            transaction(node, new_information)
+            node.transaction(node, new_information)
 
         elif commands[0] == "checkChain":
             checkChain(commands[1])
