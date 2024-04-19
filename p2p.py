@@ -376,7 +376,7 @@ if __name__ == "__main__":
             checkMoney(commands[1])
         
         elif commands[0] == "checkAllChains":
-            print(f"Command Error : {command} 未完成")
+            node.checkAllChains(commands[1])
 
         elif commands[0] == "exit":
             break
