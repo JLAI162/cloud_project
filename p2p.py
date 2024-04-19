@@ -2,6 +2,7 @@ import os
 import hashlib 
 import socket
 import threading
+import time
 
 volume_locate = "./BChain/" # 區塊鏈儲存點
 
@@ -125,7 +126,7 @@ class P2PNode:
         message = f"request_checkAllChains,{local_addr}" 
         self.send_messages_to_all(message)
 
-        sleep(5)
+        time.sleep(5)
 
         if len(response_list) < len(peers) + 1:
             print("reponse node < 50%")
