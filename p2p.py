@@ -138,7 +138,6 @@ class P2PNode:
     def send_messages(self, node, message):
         self.sock.sendto(message.encode('utf-8'), (node, port))
 
-
     def checkAllChains(self, user):
         message = f"request_checkAllChains,{local_addr}" 
         self.send_messages_to_all(message)
@@ -153,7 +152,6 @@ class P2PNode:
             print("reponse node < 50%")
 
         self.response_list.clear()
-
 
     def transaction(self, transaction_info):
         local_transaction(transaction_info)
