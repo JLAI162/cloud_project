@@ -1,4 +1,5 @@
 import socket
+import threading
 from ollama import Client
 
 port = 8001 
