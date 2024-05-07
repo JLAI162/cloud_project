@@ -22,9 +22,17 @@ async def get_html():
 # Define a route to handle POST requests
 @app.post("/send")
 async def send_message(message: Message):
-    local_ip = '172.17.0.3'
+    # 約定port
+    port = 8001
+    
+    local_ip = '172.17.0.2'
+    peers = [('172.17.0.3', port)] 
+    # setting
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((local_ip, 8001)) 
+    # send message
+    sock.sendto(message.encode('utf-8'), peer)
+    # recive message
     data, addr = self.sock.recvfrom(1024)
     message_info = data.decode('utf-8')
 
