@@ -18,14 +18,14 @@ class P2PNode:
     def _say(self):
         while True:
             content = input("Say something: ")
-            inference(content)
+            self.inference(content)
     
     def send_messages(self, message):
         for peer in self.peers:
             self.sock.sendto(message.encode('utf-8'), peer)
 
     def inference(self, content):
-        response = client.chat(model='gemma:2b', messages=[
+        response = self.client.chat(model='gemma:2b', messages=[
             {
             'role': 'user',
             'content': content,
@@ -33,7 +33,7 @@ class P2PNode:
         ])
 
         message = f"{response['message']['content']}"
-        send_messages(message)
+        self.send_messages(message)
 
 
 
