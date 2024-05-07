@@ -3,19 +3,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
-from typing import List
+import socket 
 
 app = FastAPI()
 
 # Define a model for the request body
 class Message(BaseModel):
     message: str
-
-# Define a fake response for demonstration
-fake_response = [
-    {"title": "Example Title 1", "link": "http://example.com/1", "content": "Example Content 1"},
-    {"title": "Example Title 2", "link": "http://example.com/2", "content": "Example Content 2"}
-]
 
 # Define a route to serve HTML page
 @app.get("/", response_class=HTMLResponse)
@@ -28,10 +22,17 @@ async def get_html():
 # Define a route to handle POST requests
 @app.post("/send")
 async def send_message(message: Message):
-    # For demonstration purposes, just return a fake response
-    return {"response": fake_response}
+    local_ip = '172.17.0.3'
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((local_ip, 8001)) 
+    data, addr = self.sock.recvfrom(1024)
+    message_info = data.decode('utf-8')
+
+    return {"response": {message_info}}
 
 # Run the server using Uvicorn
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8081)
+    uvicorn.run(app, host="0.0.0.0", port=8081)
+
+

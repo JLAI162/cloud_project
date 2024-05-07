@@ -99,7 +99,7 @@
             var userInput = input.value;
             input.value = '';
 
-            fetch('http://localhost:8081', { // Sending request to localhost:8081
+            fetch('http://localhost:8081/send', { // Sending request to localhost:8081
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +117,7 @@
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             })
 
-              .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error:', error));
         }
     }
 </script>
