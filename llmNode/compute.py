@@ -1,3 +1,4 @@
+# pip install ollama flask
 # app.py
 from ollama import Client
 from flask import Flask, request, jsonify, render_template
