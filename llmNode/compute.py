@@ -12,7 +12,7 @@ class Model:
     def inference(self, content):
         # call model
         response = self.client.generate(model='gemma:2b', prompt=content)
-
+        
         return f"{response['message']['content']}"
 
 
@@ -26,6 +26,7 @@ def inference():
     if request.is_json:
         data = request.get_json()
         user_message = data.get('message', '')
+        print(f"prompt: {user_message}")
         if user_message:
             
             results = model.inference(user_message)
