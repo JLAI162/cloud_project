@@ -106,17 +106,14 @@
             },
             body: JSON.stringify({message: userInput})
             })
-            .then(response => response.json())
+            .then(response => response.text()) // 使用 response.text() 解析响应为文本
             .then(data => {
-                data.response.forEach(item => {
-                    var botDiv = document.createElement('div');
-                    botDiv.classList.add('message', 'bot');
-                    botDiv.innerHTML = `Title: ${item.title}, Link: <a href="${item.link}" target="_blank">${item.link}</a>, Content: ${item.content}`;
-                    chatContainer.appendChild(botDiv);
-                });
+                var botDiv = document.createElement('div');
+                botDiv.classList.add('message', 'bot');
+                botDiv.textContent = data; // 直接将响应文本显示在 HTML 页面上
+                chatContainer.appendChild(botDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             })
-
             .catch(error => console.error('Error:', error));
         }
     }

@@ -29,7 +29,7 @@ async def send_message(message: Message):
     payload = {"message": message_text}
     
     # 目標服務器的URL
-    target_url = "http://example.com/receive"
+    target_url = "http://172.17.0.3:8081/inference"
     
     try:
         # 發送POST請求
@@ -42,13 +42,13 @@ async def send_message(message: Message):
             return {"response": response_content}
         else:
             return {"response": "無法將消息發送到服務器。"}
-            
+
     except Exception as e:
         return {"response": f"發生錯誤：{str(e)}"}
 
 # Run the server using Uvicorn
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8081)
 
 
