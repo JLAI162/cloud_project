@@ -1,4 +1,4 @@
-# pip install fastapi uvicorn
+# pip install fastapi uvicorn requests
 # server.py
 
 import requests
@@ -29,9 +29,6 @@ async def send_message(message: Message):
     # 構建要發送的數據，這取決於目標服務器的要求
     payload = {"message": message_text}
     
-    # 目標服務器的URL
-    target_url = "http://172.17.0.3:8081/"
-    
     try:
         # 發送POST請求
         response = requests.post(target_url, json=payload)
@@ -49,7 +46,10 @@ async def send_message(message: Message):
 
 # Run the server using Uvicorn
 if __name__ == "__main__":
+    # nginx 服務器的URL
+    target_url = "http://172.17.0.3:8081/"
+
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8081)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
 
 

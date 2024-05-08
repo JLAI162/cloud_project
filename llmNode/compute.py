@@ -13,7 +13,7 @@ class Model:
         # call model
         response = self.client.generate(model='gemma:2b', prompt=content)
         
-        return f"{response['message']['content']}"
+        return f"{response['response']}"
 
 
 '''
