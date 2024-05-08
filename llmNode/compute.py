@@ -1,35 +1,13 @@
-import socket
-import threading
+# app.py
 from ollama import Client
+from flask import Flask, request, jsonify, render_template
 
-# 約定port
-port = 8001
-
-local_ip = '172.17.0.3'
-peers = [('172.17.0.2', port)] 
-
-class P2PNode:
+'''
+    model part
+'''
+class Model:
     def __init__(self):
         self.client = Client(host='http://localhost:11434')
-        self.port = port 
-        self.peers = peers
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind((local_ip, self.port)) 
-
-    def start(self):
-        threading.Thread(target=self._listen).start()
-
-    def _listen(self):
-        while True:
-            data, addr = self.sock.recvfrom(1024)
-            message_info = data.decode('utf-8')
-            response = self.inference(message_info)
-
-        self.send_messages(response)    
-    
-    def send_messages(self, message):
-        for peer in self.peers:
-            self.sock.sendto(message.encode('utf-8'), peer)
 
     def inference(self, content):
         # call model
@@ -38,7 +16,27 @@ class P2PNode:
         return f"{response['message']['content']}"
 
 
+'''
+    server part
+'''
+app = Flask(__name__)
 
-if __name__ == "__main__":
-    node = P2PNode()
-    node.start()
+@app.route('/', methods=['POST'])
+def inference():
+    if request.is_json:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        if user_message:
+            
+            results = model.inference(user_message)
+
+            return jsonify({"response": results})
+        else:
+            return jsonify({"response": "沒有接收到消息！"}), 400
+    return jsonify({"response": "請求不包含 JSON 數據"}), 400
+
+
+
+if __name__ == '__main__':
+    model = Model()
+    app.run(host='0.0.0.0', port=8081, debug=True)
