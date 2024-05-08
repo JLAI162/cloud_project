@@ -1,6 +1,7 @@
 # pip install fastapi uvicorn
 # server.py
 
+import requests
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
@@ -29,7 +30,7 @@ async def send_message(message: Message):
     payload = {"message": message_text}
     
     # 目標服務器的URL
-    target_url = "http://172.17.0.3:8081/inference"
+    target_url = "http://172.17.0.3:8081/"
     
     try:
         # 發送POST請求
@@ -41,7 +42,7 @@ async def send_message(message: Message):
             response_content = response.json()
             return {"response": response_content}
         else:
-            return {"response": "無法將消息發送到服務器。"}
+            return {"response": f"無法將消息發送到服務器{response.status_code}。"}
 
     except Exception as e:
         return {"response": f"發生錯誤：{str(e)}"}
