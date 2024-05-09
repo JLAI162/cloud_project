@@ -24,13 +24,26 @@ app = Flask(__name__)
 
 @app.route('/llm', methods=['POST'])
 def inference():
+
+    work_address = "/share/work/"
+
     if request.is_json:
         data = request.get_json()
-        user_message = data.get('message', '')
+        work_id = data.get('id', '')
+
+        with open(work_address + f"{work_id}" + "input.txt", "r", encoding="utf-8") as f:
+            user_message = f.read()
+
+        # Debug print
         print(f"prompt: {user_message}")
+        
         if user_message:
             
             results = model.inference(user_message)
+
+            # 寫入輸出檔
+            with open(work_address + f"{work_id}" + "output.txt", "w", encoding="utf-8") as f:
+                f.write(results)
 
             return jsonify(results)
         else:
