@@ -36,7 +36,7 @@ async def send_message(message: Message):
         folder_name = rendom_dir_name(folder_name_length)
 
         # 檢查資料夾 "my_folder" 是否存在
-        if not os.path.exists(work_address+ f"{folder_name}"):     
+        if not os.path.exists(work_address + folder_name):     
             # 創建資料夾
             os.makedirs(folder_name)
             break
@@ -44,7 +44,7 @@ async def send_message(message: Message):
     # 從消息對象中獲取消息文本
     message_text = message.message
     # 寫入
-    with open(work_address + f"{folder_name}" + "input.txt", "w", encoding="utf-8") as f:
+    with open(work_address + folder_name + "/input.txt", "w", encoding="utf-8") as f:
         f.write(message_text)
 
     
@@ -58,8 +58,11 @@ async def send_message(message: Message):
         # 檢查響應狀態碼
         if response.status_code == 200:
             # 獲取響應內容
-            response_content = response.json()
-            return response_content
+            if response.json() == 'success':
+                with open(work_address + folder_name + "/output.txt", "r", encoding="utf-8") as f:
+                    response_content = f.read()
+
+                return response_content
         else:
             return {"response": f"無法將消息發送到服務器{response.status_code}。"}
 
@@ -77,6 +80,6 @@ if __name__ == "__main__":
     target_url = "http://172.17.0.2:8080/llm"
 
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="172.17.0.3", port=8081)
 
 

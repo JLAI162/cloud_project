@@ -31,7 +31,7 @@ def inference():
         data = request.get_json()
         work_id = data.get('id', '')
 
-        with open(work_address + f"{work_id}" + "input.txt", "r", encoding="utf-8") as f:
+        with open(work_address + work_id + "/input.txt", "r", encoding="utf-8") as f:
             user_message = f.read()
 
         # Debug print
@@ -42,10 +42,10 @@ def inference():
             results = model.inference(user_message)
 
             # 寫入輸出檔
-            with open(work_address + f"{work_id}" + "output.txt", "w", encoding="utf-8") as f:
+            with open(work_address + work_id + "/output.txt", "w", encoding="utf-8") as f:
                 f.write(results)
 
-            return jsonify(results)
+            return jsonify("success")
         else:
             return jsonify({"response": "沒有接收到消息！"}), 400
     return jsonify({"response": "請求不包含 JSON 數據"}), 400
