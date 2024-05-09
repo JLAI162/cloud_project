@@ -16,7 +16,7 @@
                 const statusDiv = document.getElementById('nodeStatus');
                 for (const [node, details] of Object.entries(data)) {
                     const nodeDiv = document.createElement('div');
-                    nodeDiv.innerHTML = `<strong>${node}</strong>: 狀態 - ${details.status}, 排隊 - ${details.queue.join(', ')}`;
+                    nodeDiv.innerHTML = `<strong>${node}</strong>: 狀態 - ${details.status}, 資源 - ${details.resource}`;
                     statusDiv.appendChild(nodeDiv);
                 }
             })

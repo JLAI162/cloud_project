@@ -18,7 +18,7 @@ def _update_status():
         output = process.communicate()[0]
         # 解碼輸出
         output = output.decode('utf-8')
-        
+
         # 寫入輸出檔
         with open("/share/node/" + node_no + ".txt", "w", encoding="utf-8") as f:
             f.write(output)
@@ -52,7 +52,7 @@ def inference():
         work_id = data.get('id', '')
 
         with open(work_address + work_id + "/status.txt", "w", encoding="utf-8") as f:
-            f.write("computing")
+            f.write(node_no+",computing")
 
         with open(work_address + work_id + "/input.txt", "r", encoding="utf-8") as f:
             user_message = f.read()
@@ -67,6 +67,10 @@ def inference():
             # 寫入輸出檔
             with open(work_address + work_id + "/output.txt", "w", encoding="utf-8") as f:
                 f.write(results)
+            
+            
+            with open(work_address + work_id + "/status.txt", "w", encoding="utf-8") as f:
+                f.write(node_no+",complete")
 
             return jsonify("success")
         else:

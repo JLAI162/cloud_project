@@ -20,20 +20,24 @@ def _listen_status():
         "node3": None
     }
     while True:
-        for file_name in last_read_time.key():
-            with open(file_name + ".txt", 'r') as file:
-                for line in file:
+        for file_name in last_read_time.keys():
+            with open("/share/node/" + file_name + ".txt", 'r') as file:
+                file_content = file.read()  
+                for line in file_content.split('\n'): 
                     match = re.search(r'(\d{2}:\d{2}:\d{2})', line)
                     if match:
                         time_str = match.group(1)
                         current_time = time.strptime(time_str, "%H:%M:%S")
                         
-                        if last_read_time[file_name] is not None and (time.mktime(current_time) - time.mktime(last_read_time)) >= 2:
-                            time_difference = time.mktime(current_time) - time.mktime(last_read_time)
+                        if last_read_time[file_name] is not None and (time.mktime(current_time) - time.mktime(last_read_time[file_name])) >= 2:
+                            time_difference = time.mktime(current_time) - time.mktime(last_read_time[file_name])
                             if time_difference > 2:
-                                node_status[file_name]['status'] = 'activate'        
+                                node_status[file_name]['status'] = 'active'        
+                            else:
+                                node_status[file_name]['status'] = 'inactive'
                         
                         last_read_time[file_name] = current_time
+                node_status[file_name]['resource'] = file_content.strip('\n')
         time.sleep(3)
 
 
@@ -70,7 +74,7 @@ async def send_message(message: Message):
         f.write(message_text)
 
     with open(work_address + folder_name + "/status.txt", "w", encoding="utf-8") as f:
-        f.write("wait")
+        f.write("unknown,wait")
     
     # 構建要發送的數據，這取決於目標服務器的要求
     payload = {"id": folder_name}
@@ -85,9 +89,6 @@ async def send_message(message: Message):
             if response.json() == 'success':
                 with open(work_address + folder_name + "/output.txt", "r", encoding="utf-8") as f:
                     response_content = f.read()
-
-                with open(work_address + folder_name + "/status.txt", "w", encoding="utf-8") as f:
-                    f.write("complete")
 
                 return response_content
         else:
@@ -108,9 +109,9 @@ if __name__ == "__main__":
     target_url = "http://172.17.0.2:8080/llm"
 
     node_status = {
-        "node1": {"status": "inactive", "queue": [101, 102]},
-        "node2": {"status": "inactive", "queue": [103]},
-        "node3": {"status": "inactive", "queue": [104, 105]}
+        "node1": {"status": "inactive", "resource": ""},
+        "node2": {"status": "inactive", "resource": ""},
+        "node3": {"status": "inactive", "resource": ""}
     }
     threading.Thread(target=_listen_status).start()
 
