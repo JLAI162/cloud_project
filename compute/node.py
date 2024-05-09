@@ -7,6 +7,8 @@ import subprocess
 from ollama import Client
 from flask import Flask, request, jsonify, render_template
 
+from wiki import search_information_from_wiki
+
 
 
 def _update_status():
@@ -32,9 +34,30 @@ class Model:
 
     def inference(self, content):
         # call model
-        response = self.client.generate(model='gemma:2b', prompt=content)
+        keyword = self.client.chat(model='gemma:2b', messages=[
+            {
+                'role': 'user',
+                'content': content + ". Please return only the key words or main topics of this content for me, for use in a web scraper on Wikipedia。example: can you introduce asia? keyword:asia,"
+            },
+        ])
         
-        return f"{response['response']}"
+        # 爬蟲
+        data_string = search_information_from_wiki(keyword['message']['content'])
+
+        response = self.client.chat(model='llama3', messages=[
+            {
+                'role': 'user',
+                'content': content + ". Please return only the key words or main topics of this content for me, for use in a web scraper on Wikipedia。example: can you introduce asia? keyword:asia,"
+            },
+            keyword['message'],
+            {
+                'role': 'user',
+                'content': f"Please use following infomation tell me about this {content}:\n {data_string}"
+            },
+
+        ])
+
+        return f"{response['message']['content']}"
 
 
 '''

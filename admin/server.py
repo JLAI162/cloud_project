@@ -46,20 +46,9 @@ def _listen_status():
 
 app = FastAPI()
 
-# 將靜態文件夾（例如CSS，JavaScript等）與FastAPI關聯
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# 創建Jinja2模板對象
-templates = Jinja2Templates(directory="templates")
-
 # Define a model for the request body
 class Message(BaseModel):
     message: str
-
-@app.get("/node", response_class=HTMLResponse)
-async def read_root(request: Request):
-    # 渲染HTML模板，將節點數據傳遞給模板
-    return templates.TemplateResponse("index.html", {"request": request, "data": node_status})
 
 # Define a route to handle POST requests
 @app.post("/send")
@@ -111,7 +100,7 @@ async def send_message(message: Message):
         return {"response": f"發生錯誤：{str(e)}"}
 
 
-@app.get("/n", response_class=JSONResponse)
+@app.get("/node", response_class=JSONResponse)
 async def get_nodes():
 
     return node_status
