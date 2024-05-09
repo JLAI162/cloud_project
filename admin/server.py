@@ -36,7 +36,7 @@ async def send_message(message: Message):
         if response.status_code == 200:
             # 獲取響應內容
             response_content = response.json()
-            return {"response": response_content}
+            return response_content
         else:
             return {"response": f"無法將消息發送到服務器{response.status_code}。"}
 
@@ -51,7 +51,7 @@ async def get_nodes():
 # Run the server using Uvicorn
 if __name__ == "__main__":
     # nginx 服務器的URL 加上路徑導向computing Node
-    target_url = "http://172.17.0.2:8080/compute"
+    target_url = "http://172.17.0.2:8080/llm"
 
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)

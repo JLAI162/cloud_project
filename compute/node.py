@@ -22,7 +22,7 @@ class Model:
 '''
 app = Flask(__name__)
 
-@app.route('/', methods=['POST'])
+@app.route('/llm', methods=['POST'])
 def inference():
     if request.is_json:
         data = request.get_json()
@@ -32,7 +32,7 @@ def inference():
             
             results = model.inference(user_message)
 
-            return jsonify({"response": results})
+            return jsonify(results)
         else:
             return jsonify({"response": "沒有接收到消息！"}), 400
     return jsonify({"response": "請求不包含 JSON 數據"}), 400

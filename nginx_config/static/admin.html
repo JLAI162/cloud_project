@@ -10,7 +10,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('/api/nodes')
+            fetch('http://localhost:8080/node')
             .then(response => response.json())
             .then(data => {
                 const statusDiv = document.getElementById('nodeStatus');
