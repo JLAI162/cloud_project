@@ -6,8 +6,10 @@ import os
 import time
 import threading
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 from helper import rendom_dir_name
@@ -29,7 +31,7 @@ def _listen_status():
                         time_str = match.group(1)
                         current_time = time.strptime(time_str, "%H:%M:%S")
                         
-                        if last_read_time[file_name] is not None and (time.mktime(current_time) - time.mktime(last_read_time[file_name])) >= 2:
+                        if last_read_time[file_name] is not None :
                             time_difference = time.mktime(current_time) - time.mktime(last_read_time[file_name])
                             if time_difference > 2:
                                 node_status[file_name]['status'] = 'active'        
@@ -44,9 +46,20 @@ def _listen_status():
 
 app = FastAPI()
 
+# 將靜態文件夾（例如CSS，JavaScript等）與FastAPI關聯
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# 創建Jinja2模板對象
+templates = Jinja2Templates(directory="templates")
+
 # Define a model for the request body
 class Message(BaseModel):
     message: str
+
+@app.get("/node", response_class=HTMLResponse)
+async def read_root(request: Request):
+    # 渲染HTML模板，將節點數據傳遞給模板
+    return templates.TemplateResponse("index.html", {"request": request, "data": node_status})
 
 # Define a route to handle POST requests
 @app.post("/send")
@@ -98,7 +111,7 @@ async def send_message(message: Message):
         return {"response": f"發生錯誤：{str(e)}"}
 
 
-@app.get("/node", response_class=JSONResponse)
+@app.get("/n", response_class=JSONResponse)
 async def get_nodes():
 
     return node_status

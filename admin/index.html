@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>管理</title>
+</head>
+<body>
+    <h1>節點狀態</h1>
+    <div id="nodeStatus">
+        {% for node, details in data.items() %}
+            <div><strong>{{ node }}</strong>: 狀態 - {{ details.status }}, 資源 - {{ details.resource }}</div>
+        {% endfor %}
+    </div>
+</body>
+</html>
