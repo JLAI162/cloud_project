@@ -46,6 +46,7 @@ def _listen_status():
 
 app = FastAPI()
 
+
 # Define a model for the request body
 class Message(BaseModel):
     message: str
@@ -102,8 +103,38 @@ async def send_message(message: Message):
 
 @app.get("/node", response_class=JSONResponse)
 async def get_nodes():
-
     return node_status
+
+@app.get("/jobs", response_class=JSONResponse)
+async def get_jobs():
+    job_flow= {}
+    complete = {}
+    compute = {}
+    wait = {}
+    work_address = "/share/work/"
+    jobs_list = os.listdir(work_address) 
+    for job_id in jobs_list:
+        with open(work_address + job_id + "/status.txt", "r", encoding="utf-8") as f:
+            content = f.read()
+            node, status = content.split(',')
+        if status == 'complete':
+            complete[job_id] = {"node": node, "overall_status": status}
+        elif status == 'computing':
+            compute[job_id] = {"node": node, "overall_status": status}
+        else :
+            wait[job_id] = {"node": node, "overall_status": status}
+
+    
+    job_flow = {**complete, **compute, **wait}
+    return job_flow
+
+@app.delete("/delete_job/{job_id}")
+async def delete_job(job_id: str):
+    if job_id in job_flow:
+        del job_flow[job_id]  # 假设删除操作
+        return {"message": f"Job {job_id} has been successfully stopped and removed."}
+    else:
+        raise HTTPException(status_code=404, detail=f"Job ID {job_id} not found.")
 
 # Run the server using Uvicorn
 if __name__ == "__main__":
@@ -116,6 +147,13 @@ if __name__ == "__main__":
         "node3": {"status": "inactive", "resource": ""}
     }
     threading.Thread(target=_listen_status).start()
+
+    # 測試
+    job_flow = {
+        "101": {"node": "node3", "overall_status": "in progress"},
+        "102": {"node": "node2", "overall_status": "completed"},
+        "104": {"node": "unknown", "overall_status": "wait"}
+    }
 
     import uvicorn
     uvicorn.run(app, host="172.17.0.3", port=8081)
