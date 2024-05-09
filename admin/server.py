@@ -38,7 +38,7 @@ async def send_message(message: Message):
         # 檢查資料夾 "my_folder" 是否存在
         if not os.path.exists(work_address + folder_name):     
             # 創建資料夾
-            os.makedirs(folder_name)
+            os.makedirs(work_address + folder_name)
             break
 
     # 從消息對象中獲取消息文本
