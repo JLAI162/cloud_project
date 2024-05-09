@@ -107,7 +107,6 @@ async def get_nodes():
 
 @app.get("/jobs", response_class=JSONResponse)
 async def get_jobs():
-    job_flow= {}
     complete = {}
     compute = {}
     wait = {}

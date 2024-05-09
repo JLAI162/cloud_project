@@ -37,7 +37,7 @@ class Model:
         keyword = self.client.chat(model='gemma:2b', messages=[
             {
                 'role': 'user',
-                'content': content + ". Please return only the key words or main topics of this content for me, for use in a web scraper on Wikipedia。(<question: can you introduce asia? keyword:asia.>,this is example)"
+                'content': content + ". Please return only the key words or main topics of this content for me, for use in a web scraper on Wikipedia。"
             },
         ])
         
