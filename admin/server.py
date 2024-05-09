@@ -2,9 +2,9 @@
 # server.py
 
 import requests
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
-from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
@@ -12,13 +12,12 @@ app = FastAPI()
 class Message(BaseModel):
     message: str
 
-# Define a route to serve HTML page
-@app.get("/", response_class=HTMLResponse)
-async def get_html():
-    with open("./homepage.html", "r") as f:
-        html_content = f.read()
-    return HTMLResponse(content=html_content)
 
+node_status = {
+    "node1": {"status": "active", "queue": [101, 102]},
+    "node2": {"status": "inactive", "queue": [103]},
+    "node3": {"status": "active", "queue": [104, 105]}
+}
 
 # Define a route to handle POST requests
 @app.post("/send")
@@ -44,10 +43,15 @@ async def send_message(message: Message):
     except Exception as e:
         return {"response": f"發生錯誤：{str(e)}"}
 
+
+@app.get("/node", response_class=JSONResponse)
+async def get_nodes():
+    return node_status
+
 # Run the server using Uvicorn
 if __name__ == "__main__":
-    # nginx 服務器的URL
-    target_url = "http://172.17.0.3:8081/"
+    # nginx 服務器的URL 加上路徑導向computing Node
+    target_url = "http://172.17.0.2:8080/compute"
 
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>管理</title>
+</head>
+<body>
+    <h1>節點狀態</h1>
+    <div id="nodeStatus"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/nodes')
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('nodeStatus');
+                for (const [node, details] of Object.entries(data)) {
+                    const nodeDiv = document.createElement('div');
+                    nodeDiv.innerHTML = `<strong>${node}</strong>: 狀態 - ${details.status}, 排隊 - ${details.queue.join(', ')}`;
+                    statusDiv.appendChild(nodeDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading node status:', error);
+            });
+        });
+    </script>
+</body>
+</html>

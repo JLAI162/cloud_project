@@ -1,0 +1,38 @@
+
+
+1. 開啟一個contianer，安裝nginx: apt install nginx
+
+2. 在/etc/nginx/conf.d/ 底下創建設定檔
+
+
+# balance.conf
+
+upstream api {
+	least_conn;
+        # target server (LLM)
+        server 172.17.0.5:8081;
+        server 172.17.0.4:8081;
+        server 172.17.0.6:8081;
+
+}
+
+server {
+        listen 8081;
+        listen [::]:8081;
+
+        # local container ip
+        server_name 172.17.0.3;
+
+
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        location / {
+                proxy_pass http://api/;
+        }
+}
+
+
+3. 設定: nginx -s reload 
+4. 啟動: service nginx start
