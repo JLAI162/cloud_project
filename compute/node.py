@@ -10,18 +10,18 @@ from flask import Flask, request, jsonify, render_template
 
 
 def _update_status():
-
-    time.sleep(3)
-    # 執行 top 命令並捕獲輸出
-    process = subprocess.Popen(['top', '-bn', '1', '-i', '-c'], stdout=subprocess.PIPE)
-    # 讀取輸出
-    output = process.communicate()[0]
-    # 解碼輸出
-    output = output.decode('utf-8')
-
-    # 寫入輸出檔
-    with open("/share/node/" + node_no + ".txt", "w", encoding="utf-8") as f:
-        f.write(output)
+    while True:
+        time.sleep(3)
+        # 執行 top 命令並捕獲輸出
+        process = subprocess.Popen(['top', '-bn', '1', '-i', '-c'], stdout=subprocess.PIPE)
+        # 讀取輸出
+        output = process.communicate()[0]
+        # 解碼輸出
+        output = output.decode('utf-8')
+        
+        # 寫入輸出檔
+        with open("/share/node/" + node_no + ".txt", "w", encoding="utf-8") as f:
+            f.write(output)
 
 '''
     model part
@@ -50,6 +50,9 @@ def inference():
     if request.is_json:
         data = request.get_json()
         work_id = data.get('id', '')
+
+        with open(work_address + work_id + "/status.txt", "w", encoding="utf-8") as f:
+            f.write("computing")
 
         with open(work_address + work_id + "/input.txt", "r", encoding="utf-8") as f:
             user_message = f.read()
