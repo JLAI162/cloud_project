@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>home</title>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding-top: 50px;
+    }
+
+    .chat-container {
+        background-color: #f4f4f8;
+        border: 1px solid #ddd;
+        padding: 10px;
+        height: 400px;
+        overflow-y: scroll;
+        margin-bottom: 20px;
+    }
+
+    .message {
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 10px;
+        color: white;
+    }
+
+    .user {
+        background-color: #007bff;
+        text-align: right;
+    }
+
+    .bot {
+        background-color: #333;
+        text-align: left;
+    }
+
+    .input-box {
+        display: flex;
+    }
+
+    .input-box input[type=text] {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px 0 0 10px;
+    }
+
+    .input-box button {
+        padding: 10px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+    }
+
+    .input-box button:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="chat-container" id="chat-container">
+        <!-- Chat messages will be added here -->
+    </div>
+    <div class="input-box">
+        <input type="text" id="user-input" placeholder="請輸入你的問題..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">發送</button>
+    </div>
+</div>
+
+<script>
+    function handleKeyPress(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        var input = document.getElementById('user-input');
+        var chatContainer = document.getElementById('chat-container');
+        if (input.value.trim() !== '') {
+            var userDiv = document.createElement('div');
+            userDiv.classList.add('message', 'user');
+            userDiv.textContent = input.value;
+            chatContainer.appendChild(userDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            var userInput = input.value;
+            input.value = '';
+
+            fetch('http://localhost:8081/', { // Sending request to localhost:8081
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({message: userInput})
+            })
+            .then(response => response.text()) // 使用 response.text() 解析响应为文本
+            .then(data => {
+                var botDiv = document.createElement('div');
+                botDiv.classList.add('message', 'bot');
+                botDiv.textContent = data; // 直接将响应文本显示在 HTML 页面上
+                chatContainer.appendChild(botDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+</script>
+</body>
+</html>

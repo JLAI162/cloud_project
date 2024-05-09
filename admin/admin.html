@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>節點和工作流狀態管理頁面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>節點狀態</h1>
+    <div id="nodeStatus"></div>
+
+    <h1>工作流狀態</h1>
+    <div id="jobStatus"></div>
+
+    <script>
+        function loadStatuses() {
+            fetch('http://localhost:8081/node')
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('nodeStatus');
+                for (const [node, details] of Object.entries(data)) {
+                    const nodeDiv = document.createElement('div');
+                    nodeDiv.innerHTML = `<strong>${node}</strong>: 狀態 - ${details.status}, 資源 - ${details.resource}`;
+                    statusDiv.appendChild(nodeDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading node status:', error);
+            });
+
+            fetch('http://localhost:8081/jobs')
+            .then(response => response.json()).then(data => {
+                const statusDiv = document.getElementById('jobStatus');
+                statusDiv.innerHTML = ''; 
+                for (const [jobId, details] of Object.entries(data)) {
+                    const jobDiv = document.createElement('div');
+                    jobDiv.innerHTML = `工作 ${jobId}: 節點 - ${details.node}, 總體狀態 - ${details.overall_status} <button onclick="deleteJob('${jobId}')">停止工作</button>`;
+                    statusDiv.appendChild(jobDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading :', error);
+            });
+        }
+
+        function deleteJob(jobId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", `http://localhost:8081/delete_job/${jobId}`, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.message);
+                        loadStatuses(); // Reload statuses after deletion
+                    } else {
+                        alert('Error deleting job: ' + xhr.statusText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        document.addEventListener("DOMContentLoaded", loadStatuses); 
+    </script>
+</body>
+</html>

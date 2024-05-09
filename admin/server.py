@@ -51,6 +51,22 @@ app = FastAPI()
 class Message(BaseModel):
     message: str
 
+# Define a route to serve HTML page
+@app.get("/", response_class=HTMLResponse)
+async def get_html():
+    with open("./homepage.html", "r") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
+
+# Define a route to serve HTML page
+@app.get("/admin", response_class=HTMLResponse)
+async def get_html():
+    with open("./admin.html", "r") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
+
+
+
 # Define a route to handle POST requests
 @app.post("/send")
 async def send_message(message: Message):
