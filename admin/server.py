@@ -5,6 +5,7 @@ import re
 import os
 import time
 import threading
+import httpx
 import requests
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -99,8 +100,10 @@ async def send_message(message: Message):
     payload = {"id": folder_name}
     
     try:
-        # 發送POST請求
-        response = requests.post(target_url, json=payload)
+
+        async with httpx.AsyncClient() as client:
+            # 發送POST請求
+            response = await client.post(target_url, json=payload)
         
         # 檢查響應狀態碼
         if response.status_code == 200:
