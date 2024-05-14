@@ -1,3 +1,0 @@
-Sha256 of previous block: x
-Next block: x
-root,angel,9999999
