@@ -6,10 +6,9 @@
 
 
 # balance.conf
+# example 
 
 upstream api {
-	least_conn;
-        # target server (LLM)
         server 172.17.0.5:8081;
         server 172.17.0.4:8081;
         server 172.17.0.6:8081;
@@ -17,12 +16,10 @@ upstream api {
 }
 
 server {
-        listen 8081;
-        listen [::]:8081;
+        listen 8080;
+        listen [::]:8080;
 
-        # local container ip
-        server_name 172.17.0.3;
-
+        server_name localhost;
 
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;

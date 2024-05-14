@@ -105,4 +105,4 @@ if __name__ == '__main__':
     node_no = "node1"
     model = Model()
     threading.Thread(target=_update_status).start()
-    app.run(host='172.17.0.3', port=8081, debug=True)
+    app.run(host='0.0.0.0', port=8081, debug=True)
