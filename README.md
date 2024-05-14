@@ -1,3 +1,3 @@
-![arch](image1)
-![workflow](image2)
+![arch](image1.jepg)
+![workflow](image2.jepg)
 
