@@ -1,11 +1,10 @@
 # pip install ollama flask
-# app.py
 
 import time
 import threading
 import subprocess
 from ollama import Client
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 
 from wiki import search_information_from_wiki
 

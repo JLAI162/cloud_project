@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup as sp
-import re
 data_string = ""
 
 def recommand_list(soup):
