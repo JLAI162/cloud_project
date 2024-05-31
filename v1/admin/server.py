@@ -145,6 +145,7 @@ async def get_jobs():
 
 @app.delete("/delete_job/{job_id}")
 async def delete_job(job_id: str):
+    # not finish
     if job_id in job_flow:
         del job_flow[job_id]  # 假设删除操作
         return {"message": f"Job {job_id} has been successfully stopped and removed."}
