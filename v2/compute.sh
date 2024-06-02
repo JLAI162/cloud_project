@@ -46,5 +46,4 @@ if __name__ == '__main__':
     prompt = sys.argv[2]
 
     print(model.inference(prompt))
-    print(id)
     asyncio.run(send_message(id))

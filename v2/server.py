@@ -33,11 +33,11 @@ class Item(BaseModel):
     id: str
 
 configuration = Configuration(
-    access_token='JWXOXf40VeKq/APq73N9QnXHoSCOXtTjIZTkY/3lYmF6e89NnVtFqFdSKShJZ+0ic6h5Qh1aHTWX9L4WoTUlWGddWF9BIiFpv0MRa9+XgaUQKsr91AMuwJBEQEH0RB2a12gwz3Vf+yTRkR1bm2yKZAdB04t89/1O/w1cDnyilFU=+XgaVwcp2T9cUBMG0L+69seM7cP0kj6AkoVTlDYeN8W47yiQdB04t89/1O/w1cDnyilFU='
+    access_token=''
 )
 api_client = ApiClient(configuration)
 line_bot_api = MessagingApi(api_client)
-parser = WebhookParser('7c50858e2a0c9a37c411b1b32f59afc0')
+parser = WebhookParser('')
 
 
 @app.post("/callback")
