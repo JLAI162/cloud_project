@@ -1,4 +1,7 @@
-# pip install ollama 
+#!/usr/bin/python
+
+# -*- coding: UTF-8 -*-
+
 import sys
 from ollama import Client
 '''
@@ -10,7 +13,7 @@ class Model:
 
     def inference(self, content):
 
-        response = self.client.chat(model='gemma:2b', messages=[
+        response = self.client.chat(model='llama3', messages=[
             {
                 'role': 'user',
                 'content': content 
@@ -21,5 +24,6 @@ class Model:
 
 if __name__ == '__main__':
     model = Model()
-    prompt = sys.argv[1]
+    id = sys.argv[1]
+    prompt = sys.argv[2]
     print(model.inference(prompt))

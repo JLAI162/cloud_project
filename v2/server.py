@@ -1,6 +1,9 @@
 
 
 # -*- coding: utf-8 -*-
+
+import subprocess
+
 from fastapi import FastAPI, Request, HTTPException
 
 from linebot.v3.webhook import WebhookParser
@@ -58,9 +61,21 @@ async def handle_callback(request: Request):
             )
         )
 
+        id = event.source.user_id
+        output = f"--output=/shared-data/tasks/{id}"
+        # 调用 sbatch 命令执行作业脚本，并传递参数
+        result = subprocess.run(['sbatch', output, 'compute.sh', id, "Hello, do you know cgu"])
+
+    # 检查 sbatch 命令的返回码
+    if result.returncode == 0:
+        print('作业提交成功')
+    else:
+        print('作业提交失败，返回码:', result.returncode)
+
+
     return 'OK'
 
-@app.get("/")
+@app.post("/response")
 async def home(id: str = None, msg: str = None):
     try:
 
