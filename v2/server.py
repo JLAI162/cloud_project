@@ -7,6 +7,8 @@ from linebot.v3.webhook import WebhookParser
 from linebot.v3.messaging import (
     AsyncApiClient,
     AsyncMessagingApi,
+    ApiClient,
+    MessagingApi,
     Configuration,
     ReplyMessageRequest,
     PushMessageRequest,
@@ -25,8 +27,8 @@ app = FastAPI()
 configuration = Configuration(
     access_token='JWXOXf40VeKq/APq73N9QnXHoSCOXtTjIZTkY/3lYmF6e89NnVtFqFdSKShJZ+0ic6h5Qh1aHTWX9L4WoTUlWGddWF9BIiFpv0MRa9+XgaUQKsr91AMuwJBEQEH0RB2a12gwz3Vf+yTRkR1bm2yKZAdB04t89/1O/w1cDnyilFU=+XgaVwcp2T9cUBMG0L+69seM7cP0kj6AkoVTlDYeN8W47yiQdB04t89/1O/w1cDnyilFU='
 )
-async_api_client = AsyncApiClient(configuration)
-line_bot_api = AsyncMessagingApi(async_api_client)
+api_client = ApiClient(configuration)
+line_bot_api = MessagingApi(api_client)
 parser = WebhookParser('7c50858e2a0c9a37c411b1b32f59afc0')
 
 
@@ -49,7 +51,7 @@ async def handle_callback(request: Request):
         if not isinstance(event.message, TextMessageContent):
             continue
 
-        await line_bot_api.reply_message(
+        line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
                 messages=[TextMessage(text=event.message.text)]
@@ -57,14 +59,15 @@ async def handle_callback(request: Request):
         )
 
     return 'OK'
+
 @app.get("/")
 async def home(id: str = None, msg: str = None):
     try:
 
         if id != None:
             line_bot_api.push_message(PushMessageRequest(
-                    to=id,
-                    messages=[TextMessage(text=msg)]
+                    to='J Lai',
+                    messages=[TextMessage(text="Push!")]
                 ))
         else:
             msg = 'ok'   
