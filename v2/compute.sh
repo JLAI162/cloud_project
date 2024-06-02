@@ -32,7 +32,7 @@ async def send_message(id):
     url = 'http://192.168.10.2:80/response'
 
     async with httpx.AsyncClient() as client:
-        await client.post(url, data={
+        await client.post(url, json={
             'id': id
         })
 
