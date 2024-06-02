@@ -4,6 +4,7 @@
 
 import sys
 import httpx
+import asyncio
 from ollama import Client
 '''
     model part
@@ -28,7 +29,7 @@ class Model:
 
 async def send_message(id):
 
-    url = 'http://127.0.0.2:80/response'
+    url = 'http://192.168.10.2:80/response'
 
     async with httpx.AsyncClient() as client:
         await client.post(url, data={
@@ -43,5 +44,5 @@ if __name__ == '__main__':
     prompt = sys.argv[2]
 
     print(model.inference(prompt))
-
+    print(id)
     asyncio.run(send_message(id))

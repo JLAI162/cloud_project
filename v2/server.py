@@ -5,6 +5,7 @@
 import subprocess
 
 from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
 
 from linebot.v3.webhook import WebhookParser
 from linebot.v3.messaging import (
@@ -26,6 +27,9 @@ from linebot.v3.webhooks import (
 )
 
 app = FastAPI()
+
+class Item(BaseModel):
+    id: str
 
 configuration = Configuration(
     access_token='JWXOXf40VeKq/APq73N9QnXHoSCOXtTjIZTkY/3lYmF6e89NnVtFqFdSKShJZ+0ic6h5Qh1aHTWX9L4WoTUlWGddWF9BIiFpv0MRa9+XgaUQKsr91AMuwJBEQEH0RB2a12gwz3Vf+yTRkR1bm2yKZAdB04t89/1O/w1cDnyilFU=+XgaVwcp2T9cUBMG0L+69seM7cP0kj6AkoVTlDYeN8W47yiQdB04t89/1O/w1cDnyilFU='
@@ -76,11 +80,11 @@ async def handle_callback(request: Request):
     return 'OK'
 
 @app.post("/response")
-async def home(id: str = None):
+async def home(item: Item):
     try:
+        id = item.id
         print(id)
         if id != None:
-            print(id)
             line_bot_api.push_message(PushMessageRequest(
                     to='J Lai',
                     messages=[TextMessage(text="Push!")]
