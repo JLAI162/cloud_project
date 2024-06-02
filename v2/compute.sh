@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # -*- coding: UTF-8 -*-
 
 import sys
+import httpx
 from ollama import Client
 '''
     model part
@@ -22,8 +23,25 @@ class Model:
 
         return f"{response['message']['content']}"
 
+
+    
+
+async def send_message(id):
+
+    url = 'http://127.0.0.2:80/response'
+
+    async with httpx.AsyncClient() as client:
+        await client.post(url, data={
+            'id': id
+        })
+
+
 if __name__ == '__main__':
     model = Model()
+
     id = sys.argv[1]
     prompt = sys.argv[2]
+
     print(model.inference(prompt))
+
+    asyncio.run(send_message(id))

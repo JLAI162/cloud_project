@@ -60,26 +60,27 @@ async def handle_callback(request: Request):
                 messages=[TextMessage(text=event.message.text)]
             )
         )
-
+        
         id = event.source.user_id
         output = f"--output=/shared-data/tasks/{id}"
         # 调用 sbatch 命令执行作业脚本，并传递参数
         result = subprocess.run(['sbatch', output, 'compute.sh', id, "Hello, do you know cgu"])
 
-    # 检查 sbatch 命令的返回码
-    if result.returncode == 0:
-        print('作业提交成功')
-    else:
-        print('作业提交失败，返回码:', result.returncode)
+        # 检查 sbatch 命令的返回码
+        if result.returncode == 0:
+            print('作业提交成功')
+        else:
+            print('作业提交失败，返回码:', result.returncode)
 
 
     return 'OK'
 
 @app.post("/response")
-async def home(id: str = None, msg: str = None):
+async def home(id: str = None):
     try:
-
+        print(id)
         if id != None:
+            print(id)
             line_bot_api.push_message(PushMessageRequest(
                     to='J Lai',
                     messages=[TextMessage(text="Push!")]
@@ -95,4 +96,4 @@ async def home(id: str = None, msg: str = None):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=80)
