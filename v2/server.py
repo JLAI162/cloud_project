@@ -1,78 +1,74 @@
+
+
+# -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
 
-
-from linebot.v3 import WebhookHandler
-from linebot.v3.exceptions import InvalidSignatureError
+from linebot.v3.webhook import WebhookParser
 from linebot.v3.messaging import (
-    Configuration, ApiClient, MessagingApi, ReplyMessageRequest, TextMessage
+    AsyncApiClient,
+    AsyncMessagingApi,
+    Configuration,
+    ReplyMessageRequest,
+    PushMessageRequest,
+    TextMessage
 )
-from linebot.v3.webhooks import MessageEvent, TextMessageContent
-
-from linebot.models import MessageEvent, TextMessage, AudioSendMessage, VideoSendMessage
-
-
-configuration = Configuration(access_token='JWXOXf40VeKq/APq73N9QnXHoSCOXtTjIZTkY/3lYmF6e89NnVtFqFdSKShJZ+0ic6h5Qh1aHTWX9L4WoTUlWGddWF9BIiFpv0MRa9+XgaUQKsr91AMuwJBEQEH0RB2a12gwz3Vf+yTRkR1bm2yKZAdB04t89/1O/w1cDnyilFU=+XgaVwcp2T9cUBMG0L+69seM7cP0kj6AkoVTlDYeN8W47yiQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('7c50858e2a0c9a37c411b1b32f59afc0')
+from linebot.v3.exceptions import (
+    InvalidSignatureError
+)
+from linebot.v3.webhooks import (
+    MessageEvent,
+    TextMessageContent
+)
 
 app = FastAPI()
 
-@app.post("/callback")
-async def callback(request: Request):
-    # Get request header
-    signature = request.headers['x-line-signature']
+configuration = Configuration(
+    access_token='JWXOXf40VeKq/APq73N9QnXHoSCOXtTjIZTkY/3lYmF6e89NnVtFqFdSKShJZ+0ic6h5Qh1aHTWX9L4WoTUlWGddWF9BIiFpv0MRa9+XgaUQKsr91AMuwJBEQEH0RB2a12gwz3Vf+yTRkR1bm2yKZAdB04t89/1O/w1cDnyilFU=+XgaVwcp2T9cUBMG0L+69seM7cP0kj6AkoVTlDYeN8W47yiQdB04t89/1O/w1cDnyilFU='
+)
+async_api_client = AsyncApiClient(configuration)
+line_bot_api = AsyncMessagingApi(async_api_client)
+parser = WebhookParser('7c50858e2a0c9a37c411b1b32f59afc0')
 
-    # Get request body as text
+
+@app.post("/callback")
+async def handle_callback(request: Request):
+    signature = request.headers['X-Line-Signature']
+
+    # get request body as text
     body = await request.body()
-    body = body.decode('utf-8')
+    body = body.decode()
 
     try:
-        # Handle webhook body
-        handler.handle(body, signature)
+        events = parser.parse(body, signature)
     except InvalidSignatureError:
         raise HTTPException(status_code=400, detail="Invalid signature")
 
+    for event in events:
+        if not isinstance(event, MessageEvent):
+            continue
+        if not isinstance(event.message, TextMessageContent):
+            continue
+
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=event.message.text)]
+            )
+        )
+
     return 'OK'
-
-@handler.add(MessageEvent, message=TextMessageContent)
-def handle_message(event):
-
-    mtext = event.message.text
-
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-
-        if mtext == '@傳送聲音':
-            try:
-                message = AudioSendMessage(
-                    original_content_url='./staticmario.m4a', 
-                    duration=20000  #聲音長度20秒
-                )
-                line_bot_api.reply_message(event.reply_token, message)
-            except:
-                line_bot_api.reply_message(event.reply_token, messages=TextMessage(text='發生錯誤！'))
-
-        elif mtext == '@傳送影片':
-            try:
-                message = VideoSendMessage(
-                    original_content_url='./static/robot.mp4',  #影片檔置於static資料夾
-                    preview_image_url='./staticrobot.jpg'
-                )
-                line_bot_api.reply_message(event.reply_token, message)
-            except:
-                line_bot_api.reply_message(event.reply_token, messages=TextMessage(text='發生錯誤！'))
-
 @app.get("/")
 async def home(id: str = None, msg: str = None):
     try:
-        with ApiClient(configuration) as api_client:
-            line_bot_api = MessagingApi(api_client)
 
-            if id != None:
-                line_bot_api.push_message(id, messages=[TextMessage(text=msg)])
-            else:
-                msg = 'ok'   
-            return msg
+        if id != None:
+            line_bot_api.push_message(PushMessageRequest(
+                    to=id,
+                    messages=[TextMessage(text=msg)]
+                ))
+        else:
+            msg = 'ok'   
+        return msg
     
     except Exception as e:
         print('error', e)
