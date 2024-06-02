@@ -61,14 +61,14 @@ async def handle_callback(request: Request):
         line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)]
+                messages=[TextMessage(text="sucess")]
             )
         )
         
         id = event.source.user_id
         output = f"--output=/shared-data/tasks/{id}"
         # 调用 sbatch 命令执行作业脚本，并传递参数
-        result = subprocess.run(['sbatch', output, 'compute.sh', id, "Hello, do you know cgu"])
+        result = subprocess.run(['sbatch', output, 'compute.sh', id, event.message.text])
 
         # 检查 sbatch 命令的返回码
         if result.returncode == 0:
@@ -86,8 +86,8 @@ async def home(item: Item):
         print(id)
         if id != None:
             output = f"/shared-data/tasks/{id}"
-            with open(output, "r", encoding="utf-8") as f:
-                reposnse_message = f.reads()
+
+            reposnse_message = open(output, "r", encoding="utf-8").read()
 
             line_bot_api.push_message(PushMessageRequest(
                     to=id,
