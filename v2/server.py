@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import asyncio
 
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
@@ -87,6 +88,7 @@ async def home(item: Item):
         if id != None:
             output = f"/shared-data/tasks/{id}"
 
+            await asyncio.sleep(5)
             reposnse_message = open(output, "r", encoding="utf-8").read()
 
             line_bot_api.push_message(PushMessageRequest(

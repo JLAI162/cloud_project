@@ -32,9 +32,11 @@ async def send_message(id):
     url = 'http://192.168.10.2:80/response'
 
     async with httpx.AsyncClient() as client:
-        await client.post(url, json={
-            'id': id
-        })
+        try:
+            await asyncio.wait_for(client.post(url, json={'id': id}), timeout=1)  # Adjust the timeout value as needed
+        except asyncio.TimeoutError:
+            # Ignore timeout errors
+            pass
 
 
 if __name__ == '__main__':
