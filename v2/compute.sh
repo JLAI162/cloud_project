@@ -5,6 +5,7 @@
 import sys
 import httpx
 import asyncio
+from ollama import Client
 from scrapegraphai.graphs import SearchGraph
 '''
     model part
