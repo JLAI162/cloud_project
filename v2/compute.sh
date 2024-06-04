@@ -25,7 +25,7 @@ class Model:
                 "temperature": 0,  # Keeps the generation deterministic
                 "base_url": "http://localhost:11434",  # Base URL for the embeddings model server
             },
-            "verbose": True,  # Enables verbose output for more detailed log information
+            "verbose": False,  # Enables verbose output for more detailed log information
         }
 
     def inference(self, content):
@@ -42,7 +42,7 @@ class Model:
         response = self.client.chat(model='gemma:2b', messages=[
             {
                 'role': 'user',
-                'content': f"This result:{result} is response for prompt :{content} . Output beatiful format for prompt" 
+                'content': f"This result:{result} is response for prompt :{content} . Output beatiful format for prompt, so remove json format. Only output the result content" 
             },
 
         ])
