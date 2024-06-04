@@ -6,6 +6,8 @@ import subprocess
 import asyncio
 
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 from linebot.v3.webhook import WebhookParser
@@ -28,6 +30,7 @@ from linebot.v3.webhooks import (
 )
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 class Item(BaseModel):
     id: str
@@ -104,8 +107,11 @@ async def home(item: Item):
         print('error', e)
         return '500 error'
 
-@app.post("/response") 
-
+@app.get("/admin", response_class=HTMLResponse)
+async def admin(request: Request):
+    result_sinfo = subprocess.run(['sinfo'], capture_output=True, text=True)
+    result_squeue = subprocess.run(['squeue'], capture_output=True, text=True)
+    return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout})
 
 if __name__ == '__main__':
     import uvicorn
