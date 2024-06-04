@@ -11,18 +11,33 @@ from ollama import Client
 '''
 class Model:
     def __init__(self):
-        self.client = Client(host='http://localhost:11434')
+        self.graph_config = {
+            "llm": {
+                "model": "ollama/llama3",  # Specifies the large language model to use
+                "temperature": 0,  # Temperature controls randomness; 0 makes it deterministic
+                "format": "json",  # Output format is set to JSON
+                "base_url": "http://localhost:11434",  # Base URL where the Ollama server is running
+            },
+            "embeddings": {
+                "model": "ollama/nomic-embed-text",  # Specifies the embedding model to use
+                "temperature": 0,  # Keeps the generation deterministic
+                "base_url": "http://localhost:11434",  # Base URL for the embeddings model server
+            },
+            "verbose": True,  # Enables verbose output for more detailed log information
+        }
 
     def inference(self, content):
 
-        response = self.client.chat(model='llama3', messages=[
-            {
-                'role': 'user',
-                'content': content 
-            }
-        ])
+        # Create an instance of SmartScraperGraph with specific instructions
+        search_graph = SearchGraph(
+            prompt=content,
+            config=self.graph_config
+        )
 
-        return f"{response['message']['content']}"
+        # Execute the scraping process
+        result = search_graph.run()
+
+        return result
 
 
     
