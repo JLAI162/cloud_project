@@ -11,6 +11,7 @@ from scrapegraphai.graphs import SearchGraph
 '''
 class Model:
     def __init__(self):
+        self.client = Client(host='http://localhost:11434')
         self.graph_config = {
             "llm": {
                 "model": "ollama/llama3",  # Specifies the large language model to use
@@ -37,7 +38,15 @@ class Model:
         # Execute the scraping process
         result = search_graph.run()
 
-        return result
+        response = self.client.chat(model='gemma:2b', messages=[
+            {
+                'role': 'user',
+                'content': f"This result:{result} is response for prompt :{content} . Output beatiful format for prompt" 
+            },
+
+        ])
+
+        return f"{response['message']['content']}"
 
 
     

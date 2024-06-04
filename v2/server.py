@@ -104,6 +104,8 @@ async def home(item: Item):
         print('error', e)
         return '500 error'
 
+@app.post("/response") 
+
 
 if __name__ == '__main__':
     import uvicorn
