@@ -111,7 +111,8 @@ async def home(item: Item):
 async def admin(request: Request):
     result_sinfo = subprocess.run(['sinfo'], capture_output=True, text=True)
     result_squeue = subprocess.run(['squeue'], capture_output=True, text=True)
-    return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout})
+    result_sprio = subprocess.run(['sprio'], capture_output=True, text=True)
+    return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout, "sprio": result_sprio.stdout})
 
 if __name__ == '__main__':
     import uvicorn
