@@ -34,7 +34,7 @@ async def send_message(id):
 
     async with httpx.AsyncClient() as client:
         try:
-            await asyncio.wait_for(client.post(url, json={'id': id}), timeout=1)  # Adjust the timeout value as needed
+            await asyncio.wait_for(client.post(url, json={'id': id, 'ftime': ftime}), timeout=1)  # Adjust the timeout value as needed
         except asyncio.TimeoutError:
             # Ignore timeout errors
             pass
@@ -44,7 +44,8 @@ if __name__ == '__main__':
     model = Model()
 
     id = sys.argv[1]
-    prompt = sys.argv[2]
+    ftime = sys.argv[2]
+    prompt = sys.argv[3]
 
     print(model.inference(prompt))
-    asyncio.run(send_message(id))
+    asyncio.run(send_message(id, ftime))

@@ -2,6 +2,8 @@
 
 # -*- coding: utf-8 -*-
 
+import os
+from datetime import datetime
 import subprocess
 import asyncio
 
@@ -36,6 +38,7 @@ templates = Jinja2Templates(directory="templates")
 
 class Item(BaseModel):
     id: str
+    ftime: str
 
 configuration = Configuration(
     access_token=''
@@ -80,13 +83,30 @@ async def handle_callback(request: Request):
         '''
         mtext = event.message.text
         id = event.source.user_id
-        output = f"--output=/shared-data/tasks/{id}"
+
+        # Get the current time
+        current_time = datetime.now()
+
+        concatenated_time = (
+            f"{current_time.year}"
+            f"{current_time.month:02d}"
+            f"{current_time.day:02d}"
+            f"{current_time.hour:02d}"
+            f"{current_time.minute:02d}"
+            f"{current_time.second:02d}"
+        )
+
+        if not os.path.exists("/shared-data/tasks/{id}"):     
+            # 創建資料夾
+            os.makedirs("/shared-data/tasks/{id}")
+
+        output = f"--output=/shared-data/tasks/{id}/{concatenated_time}"
 
         # 调用 sbatch 命令执行作业脚本，并传递参数
         if mtext[0] == '@':
-            result = subprocess.run(['sbatch', output, 'compute.sh', id, mtext[1:]])
+            result = subprocess.run(['sbatch', output, 'compute.sh', id, concatenated_time, mtext[1:]])
         else:
-            result = subprocess.run(['sbatch', output, 'normal.sh', id, mtext])
+            result = subprocess.run(['sbatch', output, 'normal.sh', id, concatenated_time, mtext])
 
         # 检查 sbatch 命令的返回码
         if result.returncode == 0:
@@ -101,9 +121,10 @@ async def handle_callback(request: Request):
 async def home(item: Item):
     try:
         id = item.id
+        ftime = item.ftime
         print(id)
         if id != None:
-            output = f"/shared-data/tasks/{id}"
+            output = f"/shared-data/tasks/{id}/{ftime}"
 
             await asyncio.sleep(5)
             reposnse_message = open(output, "r", encoding="utf-8").read()
@@ -134,7 +155,7 @@ async def admin(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout, "sprio": result_sprio.stdout})
 
 @app.post("/submit_id")
-async def submit_id(job_id: str = Form(...)):
+async def submit_id(request: Request, job_id: str = Form(...)):
     result = subprocess.run(['scancel', job_id])
 
     # 检查 scancel 命令的返回码
@@ -146,7 +167,7 @@ async def submit_id(job_id: str = Form(...)):
     result_sinfo = subprocess.run(['sinfo'], capture_output=True, text=True)
     result_squeue = subprocess.run(['squeue'], capture_output=True, text=True)
     result_sprio = subprocess.run(['sprio'], capture_output=True, text=True)
-    return templates.TemplateResponse("index.html", {"sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout, "sprio": result_sprio.stdout})
+    return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout, "sprio": result_sprio.stdout})
 
 if __name__ == '__main__':
     import uvicorn
