@@ -5,7 +5,7 @@
 import subprocess
 import asyncio
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -61,18 +61,23 @@ async def handle_callback(request: Request):
             continue
         if not isinstance(event.message, TextMessageContent):
             continue
-
+        '''
         line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
                 messages=[TextMessage(text="sucess")]
             )
         )
-        
+        '''
+        mtext = event.message.text
         id = event.source.user_id
         output = f"--output=/shared-data/tasks/{id}"
+
         # 调用 sbatch 命令执行作业脚本，并传递参数
-        result = subprocess.run(['sbatch', output, 'compute.sh', id, event.message.text])
+        if mtext[0] == '@':
+            result = subprocess.run(['sbatch', output, 'compute.sh', id, mtext[1:]])
+        else:
+            result = subprocess.run(['sbatch', output, 'noraml.sh', id, mtext])
 
         # 检查 sbatch 命令的返回码
         if result.returncode == 0:
@@ -113,6 +118,19 @@ async def admin(request: Request):
     result_squeue = subprocess.run(['squeue'], capture_output=True, text=True)
     result_sprio = subprocess.run(['sprio'], capture_output=True, text=True)
     return templates.TemplateResponse("index.html", {"request": request, "sinfo": result_sinfo.stdout, "squeue": result_squeue.stdout, "sprio": result_sprio.stdout})
+
+@app.post("/submit_id")
+async def submit_id(job_id: str = Form(...)):
+    # 處理節點ID，這裡可以添加你的業務邏輯
+    print(job_id)
+    result = subprocess.run(['scancel', job_id])
+
+    # 检查 scancel 命令的返回码
+    if result.returncode == 0:
+        print('作业刪除成功')
+    else:
+        print('作业刪除失败，返回码:', result.returncode)
+    return 'OK'
 
 if __name__ == '__main__':
     import uvicorn

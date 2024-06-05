@@ -34,5 +34,12 @@
 
     <h1>排隊序列與優先度</h1>
     <pre>{{ sprio }}</pre>
+
+    <h1>刪除工作</h1>
+    <form action="/submit_id" method="post">
+        <label for="job_id">工作ID:</label>
+        <input type="text" id="job_id" name="job_id" required>
+        <button type="submit">提交</button>
+    </form>
 </body>
 </html>
