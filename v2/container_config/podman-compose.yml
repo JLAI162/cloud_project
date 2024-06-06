@@ -1,0 +1,94 @@
+version: '3.9'
+
+services:
+  login:
+    image: my/slurm
+    container_name: login
+    privileged: true
+    stdin_open: true
+    tty: true
+    restart: always
+    hostname: login
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.10.2
+    volumes:
+      - shared-data:/shared-data
+    ports:
+      - "8080:80"  # Exposing port 80 in the container as port 8080 on the host
+      - "8022:22"  # Exposing port 22 in the container as port 8022 on the host
+
+  admin:
+    image: my/slurm 
+    container_name: admin
+    privileged: true
+    stdin_open: true
+    tty: true
+    restart: always
+    hostname: admin
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.10.3
+    volumes:
+      - shared-data:/shared-data
+    ports:
+      - "8081:80"  # Exposing port 80 in the container as port 8081 on the host
+
+  node1:
+    image: my/slurm 
+    container_name: node1
+    privileged: true
+    stdin_open: true
+    tty: true
+    restart: always
+    hostname: node1
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.10.4
+    volumes:
+      - shared-data:/shared-data
+    ports:
+      - "8082:80"  # Exposing port 80 in the container as port 8082 on the host
+
+  node2:
+    image: my/slurm 
+    container_name: node2
+    privileged: true
+    stdin_open: true
+    tty: true
+    restart: always
+    hostname: node2
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.10.5
+    volumes:
+      - shared-data:/shared-data
+    ports:
+      - "8083:80"  # Exposing port 80 in the container as port 8083 on the host
+
+  node3:
+    image: my/slurm 
+    container_name: node3
+    privileged: true
+    stdin_open: true
+    tty: true
+    restart: always
+    hostname: node3
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.10.6
+    volumes:
+      - shared-data:/shared-data
+    ports:
+      - "8084:80"  # Exposing port 80 in the container as port 8084 on the host
+
+volumes:
+  shared-data:
+
+networks:
+  cluster-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1

@@ -28,7 +28,7 @@ class Model:
 
     
 
-async def send_message(id):
+async def send_message(id, ftime):
 
     url = 'http://192.168.10.2:80/response'
 

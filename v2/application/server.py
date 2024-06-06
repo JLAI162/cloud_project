@@ -95,10 +95,10 @@ async def handle_callback(request: Request):
             f"{current_time.minute:02d}"
             f"{current_time.second:02d}"
         )
-
-        if not os.path.exists("/shared-data/tasks/{id}"):     
+        id_dir = f"/shared-data/tasks/{id}"
+        if not os.path.exists(id_dir):     
             # 創建資料夾
-            os.makedirs("/shared-data/tasks/{id}")
+            os.makedirs(id_dir)
 
         output = f"--output=/shared-data/tasks/{id}/{concatenated_time}"
 
