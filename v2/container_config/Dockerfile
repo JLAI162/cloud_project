@@ -24,11 +24,7 @@ RUN ./configure --prefix=/usr && make -j && make -j install
 
 RUN mkdir /run/munge
 
-RUN chown -R munge: /etc/munge/ /var/log/munge/ /var/lib/munge/ /run/munge/ /etc/munge/munge.key
-
-# for /usr/etc/slurm.conf & /usr/etc/cgroup.conf 
-
-RUN mkdir /usr/etc
+RUN chown -R munge: /etc/munge/ /var/log/munge/ /var/lib/munge/ /run/munge/ 
 
 RUN mkdir /var/spool/slurmctld
 

@@ -1,0 +1,3 @@
+
+slurmd node 需要執行
+mkdir /sys/fs/cgroup/system.slice
